@@ -1,4 +1,5 @@
 public class BasicFunctionLibrary {
+
     public static String ArrayToString(String[] array) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < array.length; i++) {

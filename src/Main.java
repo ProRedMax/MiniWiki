@@ -43,8 +43,8 @@ public class Main extends Application {
             "</html>"
     };
 
-    Style[] allowedStyles = new Style[]{new H1(), new H2(), new H3(), new H4(), new H5(), new H6(), new Italic(),
-            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup()};
+    Style[] allowedStyles = new Style[]{new H6(), new H5(), new H4(), new H3(), new H2(), new H1(), new Italic(),
+            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link()};
 
 
     @Override
