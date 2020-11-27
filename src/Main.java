@@ -8,6 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import wiki.mini.tags.Bold;
 import wiki.mini.tags.Italic;
 import wiki.mini.tags.Style;
 import wiki.mini.tags.H1;
@@ -25,7 +26,7 @@ public class Main extends Application {
     WebView webView;
     Button convertButton;
 
-    Style[] allowedStyles = new Style[]{new H1(), new Italic()};
+    Style[] allowedStyles = new Style[]{new H1(), new Italic(), new Bold()};
 
 
     @Override
@@ -65,11 +66,13 @@ public class Main extends Application {
             }
             html[htmlIndex] = line;
             htmlIndex++;
-            html[htmlIndex] = "<br>";
-            htmlIndex++;
         }
+
         System.out.println(Arrays.toString(html));
+        webView.getEngine().loadContent(BasicFunctionLibrary.ArrayToString(html));
+
     };
+
 
 
 }
