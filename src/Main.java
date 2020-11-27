@@ -44,7 +44,7 @@ public class Main extends Application {
     };
 
     Style[] allowedStyles = new Style[]{new H1(), new H2(), new H3(), new H4(), new H5(), new H6(), new Italic(),
-            new Bold(), new Br(), new Code()};
+            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup()};
 
 
     @Override
