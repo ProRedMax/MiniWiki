@@ -2,14 +2,19 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class h1 extends Style{
+public class Bold extends Style{
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("!\\s\\w+");
+        return null;
     }
 
     @Override
     public String toHTMLString(String word) {
-        return "<h1>" + word + "</h1>";
+        return null;
+    }
+
+    @Override
+    public String getRegex() {
+        return null;
     }
 }

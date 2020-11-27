@@ -8,9 +8,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import wiki.mini.tags.Italic;
 import wiki.mini.tags.Style;
-import wiki.mini.tags.h1;
+import wiki.mini.tags.H1;
 
+import java.util.Arrays;
+import java.util.regex.Matcher;
 
 
 public class Main extends Application {
@@ -22,7 +25,7 @@ public class Main extends Application {
     WebView webView;
     Button convertButton;
 
-    Style[] allowedStyles = new Style[]{new h1()};
+    Style[] allowedStyles = new Style[]{new H1(), new Italic()};
 
 
     @Override
@@ -50,15 +53,22 @@ public class Main extends Application {
     EventHandler<MouseEvent> onCompile = actionEvent -> {
         String text = textArea.getText();
         String[] lines = text.split("\n");
+        String[] html = new String[Integer.MAX_VALUE / 100000];
+        int htmlIndex = 0;
         for (String line : lines) {                     //Every Line
-            for (String word : line.split("\\s+")) {    //Every word in the line
-                for (int i = 0; i < allowedStyles.length; i++) {    //Every Style
-                    while (allowedStyles[i].getPattern().matcher(word).matches()) { //For every possible
-
-                    }
+            for (Style allowedStyle : allowedStyles) {    //Every Style
+                Matcher matcher = allowedStyle.getPattern().matcher(line);
+                while (matcher.find()) {
+                    line = line.replaceFirst(allowedStyle.getRegex(),
+                            allowedStyle.toHTMLString(matcher.group(1)));
                 }
             }
+            html[htmlIndex] = line;
+            htmlIndex++;
+            html[htmlIndex] = "<br>";
+            htmlIndex++;
         }
+        System.out.println(Arrays.toString(html));
     };
 
 

@@ -8,4 +8,6 @@ public abstract class Style {
 
     public abstract String toHTMLString(String word);
 
+    public abstract String getRegex();
+
 }
