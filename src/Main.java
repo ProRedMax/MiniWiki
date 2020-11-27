@@ -1,3 +1,4 @@
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -8,12 +9,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import wiki.mini.tags.Bold;
-import wiki.mini.tags.Italic;
-import wiki.mini.tags.Style;
-import wiki.mini.tags.H1;
+import wiki.mini.tags.*;
 
-import java.util.Arrays;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 
 
@@ -26,7 +27,24 @@ public class Main extends Application {
     WebView webView;
     Button convertButton;
 
-    Style[] allowedStyles = new Style[]{new H1(), new Italic(), new Bold()};
+    String[] defaultHTMLBeforeBody = new String[]{
+            "<!DOCTYPE html>",
+            "<html lang=de>",
+            "<head>",
+            "<title>MiniWiki</title>",
+            "<meta charset=\"utf-8\">",
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+            "</head>",
+            "<body>"
+    };
+
+    String[] defaultHTMLAfterBody = new String[]{
+            "</body>",
+            "</html>"
+    };
+
+    Style[] allowedStyles = new Style[]{new H1(), new H2(), new H3(), new H4(), new H5(), new H6(), new Italic(),
+            new Bold(), new Br()};
 
 
     @Override
@@ -68,11 +86,20 @@ public class Main extends Application {
             htmlIndex++;
         }
 
-        System.out.println(Arrays.toString(html));
-        webView.getEngine().loadContent(BasicFunctionLibrary.ArrayToString(html));
+        String finalHTML = BasicFunctionLibrary.ArrayToString(defaultHTMLBeforeBody)
+                + BasicFunctionLibrary.ArrayToString(html)
+                + BasicFunctionLibrary.ArrayToString(defaultHTMLAfterBody);
+        webView.getEngine().loadContent(finalHTML);
+
+        try {
+            BufferedWriter bw = Files.newBufferedWriter(Paths.get("testFiles/outHTML.html"));
+            bw.write(finalHTML);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     };
-
 
 
 }

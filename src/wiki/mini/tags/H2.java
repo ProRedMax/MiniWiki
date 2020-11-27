@@ -2,9 +2,9 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class Br extends Style{
+public class H2 extends Style{
 
-    private final String REGEX = "^()$";
+    private final String REGEX = "!!\\s([^!]+)";
 
     @Override
     public Pattern getPattern() {
@@ -13,7 +13,7 @@ public class Br extends Style{
 
     @Override
     public String toHTMLString(String word) {
-        return "<br>";
+        return "<h2>" + word + "</h2>";
     }
 
     @Override
