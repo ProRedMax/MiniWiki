@@ -1,24 +1,39 @@
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
 
+import java.awt.*;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 
 public class Main extends Application {
+
+    private Desktop desktop = Desktop.getDesktop();
+
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -53,6 +68,56 @@ public class Main extends Application {
 
         Canvas canvas = new Canvas(50, 600);
         BorderPane main = new BorderPane(canvas);
+
+        // Create MenuBar
+        MenuBar menuBar = new MenuBar();
+
+        // Create menus
+        Menu fileMenu = new Menu("File");
+        Menu editMenu = new Menu("Edit");
+        Menu helpMenu = new Menu("Help");
+
+        // Create MenuItems
+        MenuItem newItem = new MenuItem("New");
+        MenuItem openFileItem = new MenuItem("Open File");
+        MenuItem exitItem = new MenuItem("Exit");
+
+        // Set Accelerator for Exit MenuItem.
+        exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
+
+        // When user click on the Exit item.
+        exitItem.setOnAction(event -> System.exit(0));
+
+
+
+
+        openFileItem.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(stage);
+            StringBuilder finalString = new StringBuilder();
+            if (file != null) {
+                try {
+                    BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(file.getAbsolutePath()));
+                    String line = "";
+                    while ((line = bufferedReader.readLine()) != null) {
+                        finalString.append(line).append("\n");
+                    }
+                    textArea.setText(finalString.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // Add menuItems to the Menus
+        fileMenu.getItems().addAll(newItem, openFileItem, exitItem);
+
+        // Add Menus to the MenuBar
+        menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
+
+        main.setTop(menuBar);
+
+
 
         textArea = new TextArea();
         webView = new WebView();
@@ -99,6 +164,7 @@ public class Main extends Application {
             e.printStackTrace();
         }
     };
+
 
 
 }
