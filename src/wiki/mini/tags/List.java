@@ -2,9 +2,13 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class Bold extends Style{
+public class List extends Style {
 
-    private final String REGEX = "''([^'']+)''";
+    private static int currentIndention = 0;
+
+    private static boolean first = false;
+
+    private final String REGEX = "(-+[^-]+)";
 
     @Override
     public Pattern getPattern() {
@@ -13,7 +17,7 @@ public class Bold extends Style{
 
     @Override
     public String toHTMLString(String word) {
-        return "<b>" + word + "</b>";
+        return null;
     }
 
     @Override

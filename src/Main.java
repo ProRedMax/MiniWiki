@@ -88,9 +88,6 @@ public class Main extends Application {
         // When user click on the Exit item.
         exitItem.setOnAction(event -> System.exit(0));
 
-
-
-
         openFileItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(stage);
