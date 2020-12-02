@@ -1,6 +1,5 @@
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -14,19 +13,15 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 
@@ -41,6 +36,9 @@ public class Main extends Application {
     TextArea textArea;
     WebView webView;
     Button convertButton;
+    String finalHTML;
+    String[] html;
+    File currentFile;
 
     String[] defaultHTMLBeforeBody = new String[]{
             "<!DOCTYPE html>",
@@ -78,15 +76,28 @@ public class Main extends Application {
         Menu helpMenu = new Menu("Help");
 
         // Create MenuItems
-        MenuItem newItem = new MenuItem("New");
+        MenuItem newItem = new MenuItem("Save File As");
+        MenuItem saveItem = new MenuItem("Save");
         MenuItem openFileItem = new MenuItem("Open File");
+        MenuItem extractHTML = new MenuItem("Extract HTML");
         MenuItem exitItem = new MenuItem("Exit");
 
-        // Set Accelerator for Exit MenuItem.
+        newItem.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
+        saveItem.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
+        extractHTML.setAccelerator(KeyCombination.keyCombination(("Ctrl+H")));
 
-        // When user click on the Exit item.
         exitItem.setOnAction(event -> System.exit(0));
+
+        extractHTML.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("HTML file", "*.html"),
+                    new FileChooser.ExtensionFilter("HTML file", "*.htm")
+            );
+            setHTML();
+            createFile(stage, fileChooser, finalHTML);
+        });
 
         openFileItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
@@ -95,7 +106,7 @@ public class Main extends Application {
             if (file != null) {
                 try {
                     BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(file.getAbsolutePath()));
-                    String line = "";
+                    String line;
                     while ((line = bufferedReader.readLine()) != null) {
                         finalString.append(line).append("\n");
                     }
@@ -106,14 +117,41 @@ public class Main extends Application {
             }
         });
 
+        newItem.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Text Files", "*.txt")
+            );
+            createFile(stage, fileChooser, textArea.getText());
+        });
+
+        saveItem.setOnAction(actionEvent -> {
+            if (currentFile != null) {
+                try {
+                    FileWriter fileWriter = new FileWriter(currentFile, false);
+                    setHTML();
+                    fileWriter.write(textArea.getText());
+                    fileWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("Text Files", "*.txt")
+                );
+                createFile(stage, fileChooser, textArea.getText());
+            }
+        });
+
+
         // Add menuItems to the Menus
-        fileMenu.getItems().addAll(newItem, openFileItem, exitItem);
+        fileMenu.getItems().addAll(saveItem, newItem, openFileItem, exitItem, extractHTML);
 
         // Add Menus to the MenuBar
         menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
 
         main.setTop(menuBar);
-
 
 
         textArea = new TextArea();
@@ -131,10 +169,33 @@ public class Main extends Application {
         stage.show();
     }
 
+    private void createFile(Stage stage, FileChooser fileChooser, String text) {
+        File file = fileChooser.showSaveDialog(stage);
+        try {
+            FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
+            fileWriter.write(text);
+            fileWriter.close();
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("IO Exception");
+            alert.setContentText("There was an error during the file creation process! Try again!");
+            alert.showAndWait();
+        }
+        if (file.getName().split("\\.")[1].equalsIgnoreCase("txt")) {
+            currentFile = file;
+        }
+    }
+
     EventHandler<MouseEvent> onCompile = actionEvent -> {
+        setHTML();
+    };
+
+    private void setHTML() {
         String text = textArea.getText();
         String[] lines = text.split("\n");
-        String[] html = new String[Integer.MAX_VALUE / 100000];
+        html = new String[Integer.MAX_VALUE / 100000];
         int htmlIndex = 0;
         for (String line : lines) {                     //Every Line
             for (Style allowedStyle : allowedStyles) {    //Every Style
@@ -148,20 +209,10 @@ public class Main extends Application {
             htmlIndex++;
         }
 
-        String finalHTML = BasicFunctionLibrary.ArrayToString(defaultHTMLBeforeBody)
+        finalHTML = BasicFunctionLibrary.ArrayToString(defaultHTMLBeforeBody)
                 + BasicFunctionLibrary.ArrayToString(html)
                 + BasicFunctionLibrary.ArrayToString(defaultHTMLAfterBody);
         webView.getEngine().loadContent(finalHTML);
-
-        try {
-            BufferedWriter bw = Files.newBufferedWriter(Paths.get("testFiles/outHTML.html"));
-            bw.write(finalHTML);
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    };
-
-
+    }
 
 }
