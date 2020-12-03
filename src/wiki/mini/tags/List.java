@@ -1,12 +1,12 @@
 package wiki.mini.tags;
 
+import wiki.mini.BasicFunctionLibrary;
+
 import java.util.regex.Pattern;
 
 public class List extends Style {
 
-    private static int currentIndention = 0;
-
-    private static boolean first = false;
+    static boolean inList = true;
 
     private final String REGEX = "(-+[^-]+)";
 
@@ -17,7 +17,17 @@ public class List extends Style {
 
     @Override
     public String toHTMLString(String word) {
-        return null;
+        String returnString = "";
+        String content = word.substring(BasicFunctionLibrary.countSameCharInSequence(word, '-'));
+        if (inList) {
+            returnString += BasicFunctionLibrary.multiplyString("<ul><li>",
+                    BasicFunctionLibrary.countSameCharInSequence(word, '-'));
+            returnString += content;
+            returnString += BasicFunctionLibrary.multiplyString("</ul></li>",
+                    BasicFunctionLibrary.countSameCharInSequence(word, '-'));
+        }
+
+        return returnString;
     }
 
     @Override

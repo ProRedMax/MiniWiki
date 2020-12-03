@@ -1,3 +1,4 @@
+package wiki.mini;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -13,12 +14,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
 
-import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,8 +25,6 @@ import java.util.regex.Matcher;
 
 
 public class Main extends Application {
-
-    private Desktop desktop = Desktop.getDesktop();
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -57,11 +54,11 @@ public class Main extends Application {
     };
 
     Style[] allowedStyles = new Style[]{new H6(), new H5(), new H4(), new H3(), new H2(), new H1(), new Italic(),
-            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link()};
+            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link(), new List()};
 
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         stage.setTitle("Mini Wiki");
 
         Canvas canvas = new Canvas(50, 600);
@@ -176,21 +173,21 @@ public class Main extends Application {
             fileWriter.write(text);
             fileWriter.close();
 
-        } catch (IOException e) {
+            if (file.getName().split("\\.")[1].equalsIgnoreCase("txt")) {
+                currentFile = file;
+            }
+
+        } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("IO Exception");
             alert.setContentText("There was an error during the file creation process! Try again!");
             alert.showAndWait();
         }
-        if (file.getName().split("\\.")[1].equalsIgnoreCase("txt")) {
-            currentFile = file;
-        }
+
     }
 
-    EventHandler<MouseEvent> onCompile = actionEvent -> {
-        setHTML();
-    };
+    EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
 
     private void setHTML() {
         String text = textArea.getText();
