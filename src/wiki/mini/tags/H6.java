@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class H6 extends Style{
 
-    private final String REGEX = "!!!!!!\\s([^!]+)";
+    private final String REGEX = "^!!!!!!\\s(.+)";
 
     @Override
     public Pattern getPattern() {

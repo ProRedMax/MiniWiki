@@ -224,9 +224,9 @@ public class Main extends Application {
                     }
                     line = line.replaceFirst(allowedStyle.getRegex(),
                             allowedStyle.toHTMLString(matcher.group(1)));
-                    htmlLine.append(line);
                 }
             }
+            htmlLine.append(line);
             html[htmlIndex] = htmlLine.toString();
             htmlIndex++;
         }
