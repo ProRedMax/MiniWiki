@@ -13,6 +13,9 @@ public class BasicFunctionLibrary {
     }
 
     public static String multiplyString(String str, int times) {
+        if (times <= 0) {
+            return "";
+        }
         return String.valueOf(str).repeat(Math.max(0, times));
     }
 

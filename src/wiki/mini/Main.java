@@ -18,6 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
 
+import java.awt.event.WindowStateListener;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -189,21 +190,51 @@ public class Main extends Application {
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
 
+//-Hallo
+//--Hallo
+//--Hallo
+//-Moin
+//--Moin
+//--Moin
+//-Grüßgott
+//-Grüßgott
+
     private void setHTML() {
+        boolean inList = false;
         String text = textArea.getText();
         String[] lines = text.split("\n");
+        StringBuilder htmlLine = new StringBuilder();
         html = new String[Integer.MAX_VALUE / 100000];
         int htmlIndex = 0;
-        for (String line : lines) {                     //Every Line
+        for (String line : lines) { //Every Line
+            htmlLine = new StringBuilder();
             for (Style allowedStyle : allowedStyles) {    //Every Style
                 Matcher matcher = allowedStyle.getPattern().matcher(line);
                 while (matcher.find()) {
+                    if (allowedStyle instanceof List && !inList) {
+                        htmlLine.append("<ul>");
+                        inList = true;
+                    }
+                    if (!(allowedStyle instanceof List) && inList) {
+                        htmlLine.append("</ul>");
+                        inList = false;
+                        for (Style style : allowedStyles) {
+                            style.resetVariables();
+                        }
+                    }
                     line = line.replaceFirst(allowedStyle.getRegex(),
                             allowedStyle.toHTMLString(matcher.group(1)));
+                    htmlLine.append(line);
                 }
             }
-            html[htmlIndex] = line;
+            html[htmlIndex] = htmlLine.toString();
             htmlIndex++;
+        }
+        if (inList) {
+            html[htmlIndex] = "</ul>";
+            for (Style style : allowedStyles) {
+                style.resetVariables();
+            }
         }
 
         finalHTML = BasicFunctionLibrary.ArrayToString(defaultHTMLBeforeBody)

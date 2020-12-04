@@ -1,14 +1,21 @@
 package wiki.mini.tags;
 
-import wiki.mini.BasicFunctionLibrary;
-
 import java.util.regex.Pattern;
+
+import static wiki.mini.BasicFunctionLibrary.countSameCharInSequence;
+import static wiki.mini.BasicFunctionLibrary.multiplyString;
 
 public class List extends Style {
 
-    static boolean inList = true;
+
+    static int currentIndention = 0;
 
     private final String REGEX = "(-+[^-]+)";
+
+    @Override
+    public void resetVariables() {
+        currentIndention = 0;
+    }
 
     @Override
     public Pattern getPattern() {
@@ -18,14 +25,19 @@ public class List extends Style {
     @Override
     public String toHTMLString(String word) {
         String returnString = "";
-        String content = word.substring(BasicFunctionLibrary.countSameCharInSequence(word, '-'));
-        if (inList) {
-            returnString += BasicFunctionLibrary.multiplyString("<ul><li>",
-                    BasicFunctionLibrary.countSameCharInSequence(word, '-'));
-            returnString += content;
-            returnString += BasicFunctionLibrary.multiplyString("</ul></li>",
-                    BasicFunctionLibrary.countSameCharInSequence(word, '-'));
+        String content = word.substring(countSameCharInSequence(word, '-'));
+        int indention = countSameCharInSequence(word, '-');
+        if (currentIndention != 0) {
+            returnString += currentIndention - indention == 0 ? "</li>" : multiplyString("</li>\n</ul>\n</li>", currentIndention - indention);
+        } else {
+            currentIndention = 1;
         }
+
+        returnString += currentIndention - indention >= 0 ? "<li>" : multiplyString("<ul><li>", Math.abs(currentIndention - indention));
+
+        returnString += content;
+
+        currentIndention = indention;
 
         return returnString;
     }
