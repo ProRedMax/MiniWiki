@@ -8,7 +8,7 @@ import static wiki.mini.BasicFunctionLibrary.multiplyString;
 public class List extends Style {
 
 
-    static int currentIndention = 0;
+    public static int currentIndention = 0;
 
     private final String REGEX = "(-+[^-]+)";
 

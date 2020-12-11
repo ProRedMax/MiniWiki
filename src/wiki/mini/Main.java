@@ -59,7 +59,7 @@ public class Main extends Application {
 
 
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
         stage.setTitle("Mini Wiki");
 
         Canvas canvas = new Canvas(50, 600);
@@ -190,15 +190,6 @@ public class Main extends Application {
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
 
-//-Hallo
-//--Hallo
-//--Hallo
-//-Moin
-//--Moin
-//--Moin
-//-Grüßgott
-//-Grüßgott
-
     private void setHTML() {
         boolean inList = false;
         String text = textArea.getText();
@@ -216,7 +207,7 @@ public class Main extends Application {
                         inList = true;
                     }
                     if (!(allowedStyle instanceof List) && inList) {
-                        htmlLine.append("</ul>");
+                        htmlLine.append(BasicFunctionLibrary.multiplyString("</li></ul>", List.currentIndention));
                         inList = false;
                         for (Style style : allowedStyles) {
                             style.resetVariables();
@@ -231,7 +222,7 @@ public class Main extends Application {
             htmlIndex++;
         }
         if (inList) {
-            html[htmlIndex] = "</ul>";
+            html[htmlIndex] = BasicFunctionLibrary.multiplyString("</li></ul>", List.currentIndention);
             for (Style style : allowedStyles) {
                 style.resetVariables();
             }
