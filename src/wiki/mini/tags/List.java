@@ -27,14 +27,13 @@ public class List extends Style {
         String returnString = "";
         String content = word.substring(countSameCharInSequence(word, '-'));
         int indention = countSameCharInSequence(word, '-');
-        int relativeIndention = currentIndention - indention;
         if (currentIndention != 0) {
-            returnString += relativeIndention == 0 ? "</li>" : multiplyString("</li>\n</ul>\n</li>", relativeIndention);
+            returnString += currentIndention - indention == 0 ? "</li>" : multiplyString("</li>\n</ul>\n</li>", currentIndention - indention);
         } else {
             currentIndention = 1;
         }
 
-        returnString += relativeIndention >= 0 ? "<li>" : multiplyString("<ul><li>", Math.abs(relativeIndention));
+        returnString += currentIndention - indention >= 0 ? "<li>" : multiplyString("<ul><li>", Math.abs(currentIndention - indention));
 
         returnString += content;
 
