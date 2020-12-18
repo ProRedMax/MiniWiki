@@ -25,8 +25,17 @@ import java.nio.file.Paths;
 import java.util.regex.Matcher;
 
 
+/**
+ * Main Class start the JavaFX Application ans stores important global variables
+ * @author Maxmilian Burger
+ * @version v.1
+ */
 public class Main extends Application {
 
+    /**
+     * Starting the actual application
+     * @param args Args
+     */
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -34,10 +43,22 @@ public class Main extends Application {
     TextArea textArea;
     WebView webView;
     Button convertButton;
+    /**
+     * The html that is being written into the file
+     */
     String finalHTML;
+    /**
+     * The html code that the user has input
+     */
     String[] html;
+    /**
+     * The file the user is currently using
+     */
     File currentFile;
 
+    /**
+     * Default HTML construct before the code
+     */
     String[] defaultHTMLBeforeBody = new String[]{
             "<!DOCTYPE html>",
             "<html lang=de>",
@@ -49,15 +70,25 @@ public class Main extends Application {
             "<body>"
     };
 
+    /**
+     * Default HMTL construct after the code
+     */
     String[] defaultHTMLAfterBody = new String[]{
             "</body>",
             "</html>"
     };
 
+    /**
+     * All Styles that should be checked
+     */
     Style[] allowedStyles = new Style[]{new H6(), new H5(), new H4(), new H3(), new H2(), new H1(), new Italic(),
             new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link(), new List()};
 
 
+    /**
+     * JavaFX Application start method
+     * @param stage Stage
+     */
     @Override
     public void start(Stage stage) {
         stage.setTitle("Mini Wiki");
@@ -80,13 +111,17 @@ public class Main extends Application {
         MenuItem extractHTML = new MenuItem("Extract HTML");
         MenuItem exitItem = new MenuItem("Exit");
 
+        //Keybinds
         newItem.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
         saveItem.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
         extractHTML.setAccelerator(KeyCombination.keyCombination(("Ctrl+H")));
 
+        //Events
+        //Exit program
         exitItem.setOnAction(event -> System.exit(0));
 
+        //Extract HTML
         extractHTML.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
@@ -97,6 +132,7 @@ public class Main extends Application {
             createFile(stage, fileChooser, finalHTML);
         });
 
+        //Open File
         openFileItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(stage);
@@ -115,6 +151,7 @@ public class Main extends Application {
             }
         });
 
+        //SaveFileAs
         newItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
@@ -123,6 +160,7 @@ public class Main extends Application {
             createFile(stage, fileChooser, textArea.getText());
         });
 
+        //SaveAs
         saveItem.setOnAction(actionEvent -> {
             if (currentFile != null) {
                 try {
@@ -167,6 +205,12 @@ public class Main extends Application {
         stage.show();
     }
 
+    /**
+     * Method used in the events
+     * @param stage Stage
+     * @param fileChooser Filechosser
+     * @param text Content
+     */
     private void createFile(Stage stage, FileChooser fileChooser, String text) {
         File file = fileChooser.showSaveDialog(stage);
         try {
@@ -190,6 +234,9 @@ public class Main extends Application {
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
 
+    /**
+     * Set HTML Method Converts the markdown language into HTML Code
+     */
     private void setHTML() {
         boolean inList = false;
         String text = textArea.getText();
@@ -201,7 +248,7 @@ public class Main extends Application {
             htmlLine = new StringBuilder();
             for (Style allowedStyle : allowedStyles) {    //Every Style
                 Matcher matcher = allowedStyle.getPattern().matcher(line);
-                while (matcher.find()) {
+                while (matcher.find()) {    //Every Match
                     if (allowedStyle instanceof List && !inList) {
                         htmlLine.append("<ul>");
                         inList = true;
@@ -221,6 +268,7 @@ public class Main extends Application {
             html[htmlIndex] = htmlLine.toString();
             htmlIndex++;
         }
+        //Closing the list when the markdown file ends IF IN LIST
         if (inList) {
             html[htmlIndex] = BasicFunctionLibrary.multiplyString("</li></ul>", List.currentIndention);
             for (Style style : allowedStyles) {
