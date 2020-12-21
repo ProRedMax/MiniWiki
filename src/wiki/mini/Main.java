@@ -110,16 +110,21 @@ public class Main extends Application {
         MenuItem openFileItem = new MenuItem("Open File");
         MenuItem extractHTML = new MenuItem("Extract HTML");
         MenuItem exitItem = new MenuItem("Exit");
+        MenuItem compileHTML = new MenuItem("Compile to HTML");
 
         //Keybinds
         newItem.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
         saveItem.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
         extractHTML.setAccelerator(KeyCombination.keyCombination(("Ctrl+H")));
+        compileHTML.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+C"));
 
         //Events
         //Exit program
         exitItem.setOnAction(event -> System.exit(0));
+
+        //Compile from Menubar
+        compileHTML.setOnAction(actionEvent -> setHTML());
 
         //Extract HTML
         extractHTML.setOnAction(actionEvent -> {
@@ -183,6 +188,7 @@ public class Main extends Application {
 
         // Add menuItems to the Menus
         fileMenu.getItems().addAll(saveItem, newItem, openFileItem, exitItem, extractHTML);
+        editMenu.getItems().addAll(compileHTML);
 
         // Add Menus to the MenuBar
         menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);

@@ -9,7 +9,7 @@ public class List extends Style {
 
     public static int currentIndention = 0;
 
-    private final String REGEX = "(-+[^-]+)";
+    private final String REGEX = "^(-+[^-]+)";
 
     @Override
     public void resetVariables() {
