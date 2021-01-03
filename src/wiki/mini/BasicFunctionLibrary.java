@@ -1,5 +1,10 @@
 package wiki.mini;
 
+import javafx.scene.control.Alert;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Function Library which contains useful methods
  * @author Maxmilian Burger
@@ -67,6 +72,22 @@ public class BasicFunctionLibrary {
             }
         }
         return count;
+    }
+
+    public static void createRequest(String title, String headText, String text) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(headText);
+        alert.setContentText(text);
+        alert.showAndWait();
+    }
+
+    public static String versionsToString(HashMap<Integer,String> map) {
+        StringBuilder returnString = new StringBuilder();
+        for (Integer i : map.keySet()) {
+            returnString.append(":").append(i.toString()).append(":").append(map.get(i));
+        }
+        return returnString.toString();
     }
 
 }

@@ -17,6 +17,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
+import wiki.mini.version.control.MWVC;
 
 import java.awt.event.WindowStateListener;
 import java.io.*;
@@ -160,7 +161,7 @@ public class Main extends Application {
         newItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Text Files", "*.txt")
+                    new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw")
             );
             createFile(stage, fileChooser, textArea.getText());
         });
@@ -179,7 +180,7 @@ public class Main extends Application {
             } else {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Text Files", "*.txt")
+                        new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw")
                 );
                 createFile(stage, fileChooser, textArea.getText());
             }
@@ -221,22 +222,21 @@ public class Main extends Application {
         File file = fileChooser.showSaveDialog(stage);
         try {
             FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
-            fileWriter.write(text);
+            MWVC.readVersions(file.getAbsolutePath());
+            fileWriter.write(BasicFunctionLibrary.versionsToString(MWVC.versions));
             fileWriter.close();
 
-            if (file.getName().split("\\.")[1].equalsIgnoreCase("txt")) {
+            if (file.getName().split("\\.")[1].equalsIgnoreCase("mw")) {
                 currentFile = file;
             }
 
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("IO Exception");
-            alert.setContentText("There was an error during the file creation process! Try again!");
-            alert.showAndWait();
+            BasicFunctionLibrary.createRequest("Error", "IO Exception", "There was an error during the file creation process! Try again!");
         }
 
     }
+
+
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
 
