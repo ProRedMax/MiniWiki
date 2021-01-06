@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 
 /**
  * Main Class start the JavaFX Application ans stores important global variables
+ *
  * @author Maxmilian Burger
  * @version v.1
  */
@@ -35,6 +36,7 @@ public class Main extends Application {
 
     /**
      * Starting the actual application
+     *
      * @param args Args
      */
     public static void main(String[] args) {
@@ -88,6 +90,7 @@ public class Main extends Application {
 
     /**
      * JavaFX Application start method
+     *
      * @param stage Stage
      */
     @Override
@@ -142,18 +145,15 @@ public class Main extends Application {
         openFileItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(stage);
-            StringBuilder finalString = new StringBuilder();
+            String[] content = new String[12345678];
             if (file != null) {
-                try {
-                    BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(file.getAbsolutePath()));
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        finalString.append(line).append("\n");
+                MWVC.readVersions(file.getAbsolutePath());
+                for (String line : MWVC.versions.values()) {
+                    for (String change : line.split(";")) {
+                        content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
                     }
-                    textArea.setText(finalString.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+                textArea.setText(BasicFunctionLibrary.ArrayToString(content));
             }
         });
 
@@ -214,9 +214,10 @@ public class Main extends Application {
 
     /**
      * Method used in the events
-     * @param stage Stage
+     *
+     * @param stage       Stage
      * @param fileChooser Filechosser
-     * @param text Content
+     * @param text        Content
      */
     private void createFile(Stage stage, FileChooser fileChooser, String text) {
         File file = fileChooser.showSaveDialog(stage);
@@ -235,7 +236,6 @@ public class Main extends Application {
         }
 
     }
-
 
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();

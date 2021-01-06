@@ -1,8 +1,6 @@
 package wiki.mini.version.control;
 
 import wiki.mini.BasicFunctionLibrary;
-import wiki.mini.Main;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +16,7 @@ public class MWVC {
             String line = "";
             int version = 0;
             while ((line = rd.readLine()) != null) {
-                versions.put(version, line.trim().split(":\\n:")[0]);
+                versions.put(version, line.trim().split(":\\d+:")[1]);
                 version++;
             }
         } catch (IOException e) {

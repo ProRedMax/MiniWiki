@@ -3,16 +3,17 @@ package wiki.mini;
 import javafx.scene.control.Alert;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Function Library which contains useful methods
+ *
  * @author Maxmilian Burger
  */
 public class BasicFunctionLibrary {
 
     /**
      * Converts an array
+     *
      * @param array Array
      * @return String
      */
@@ -20,15 +21,18 @@ public class BasicFunctionLibrary {
         StringBuffer sb = new StringBuffer();
         for (String s : array) {
             if (s != null) {
-                sb.append(s).append(System.lineSeparator());
+                sb.append(s.replace("\"", "")).append(System.lineSeparator());
+            }else {
+                sb.append("\0");
             }
         }
-        return sb.toString();
+        return sb.toString().trim().replace("\0", "\n");
     }
 
     /**
      * Multiplies the given string
-     * @param str String
+     *
+     * @param str   String
      * @param times Times
      * @return String
      */
@@ -41,9 +45,10 @@ public class BasicFunctionLibrary {
 
     /**
      * how often a string is in another string (currently not used)
-     * @param base Base string
+     *
+     * @param base     Base string
      * @param toSearch toSearch
-     * @param until look for string until index
+     * @param until    look for string until index
      * @return N
      */
     public static int countString(String base, String toSearch, int until) {
@@ -57,7 +62,7 @@ public class BasicFunctionLibrary {
     }
 
     /**
-     * @param base String
+     * @param base     String
      * @param toSearch Character to search
      * @return N
      */
@@ -82,7 +87,7 @@ public class BasicFunctionLibrary {
         alert.showAndWait();
     }
 
-    public static String versionsToString(HashMap<Integer,String> map) {
+    public static String versionsToString(HashMap<Integer, String> map) {
         StringBuilder returnString = new StringBuilder();
         for (Integer i : map.keySet()) {
             returnString.append(":").append(i.toString()).append(":").append(map.get(i));
