@@ -43,9 +43,9 @@ public class Main extends Application {
         Application.launch(args);
     }
 
-    TextArea textArea;
-    WebView webView;
-    Button convertButton;
+    public static TextArea textArea;
+    static WebView webView;
+    static Button convertButton;
     /**
      * The html that is being written into the file
      */
@@ -57,7 +57,7 @@ public class Main extends Application {
     /**
      * The file the user is currently using
      */
-    File currentFile;
+    public static File currentFile;
 
     /**
      * Default HTML construct before the code
@@ -111,7 +111,7 @@ public class Main extends Application {
         // Create MenuItems
         MenuItem newItem = new MenuItem("Save File As");
         MenuItem saveItem = new MenuItem("Save");
-        MenuItem openFileItem = new MenuItem("Open File");
+        MenuItem openProjectItem = new MenuItem("Open Project");
         MenuItem extractHTML = new MenuItem("Extract HTML");
         MenuItem exitItem = new MenuItem("Exit");
         MenuItem compileHTML = new MenuItem("Compile to HTML");
@@ -141,8 +141,8 @@ public class Main extends Application {
             createFile(stage, fileChooser, finalHTML);
         });
 
-        //Open File
-        openFileItem.setOnAction(actionEvent -> {
+        //Open Project
+        openProjectItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(stage);
             String[] content = new String[12345678];
@@ -161,7 +161,7 @@ public class Main extends Application {
         newItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw")
+                    new FileChooser.ExtensionFilter("Text File", "*.txt")
             );
             createFile(stage, fileChooser, textArea.getText());
         });
@@ -180,7 +180,7 @@ public class Main extends Application {
             } else {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw")
+                        new FileChooser.ExtensionFilter("Text File", "*.txt")
                 );
                 createFile(stage, fileChooser, textArea.getText());
             }
@@ -188,7 +188,7 @@ public class Main extends Application {
 
 
         // Add menuItems to the Menus
-        fileMenu.getItems().addAll(saveItem, newItem, openFileItem, exitItem, extractHTML);
+        fileMenu.getItems().addAll(saveItem, newItem, openProjectItem, exitItem, extractHTML);
         editMenu.getItems().addAll(compileHTML);
 
         // Add Menus to the MenuBar
