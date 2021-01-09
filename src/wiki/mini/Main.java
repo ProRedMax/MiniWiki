@@ -12,13 +12,14 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import wiki.mini.tags.*;
+import wiki.mini.tags.List;
 import wiki.mini.version.control.MWVC;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 
 /**
@@ -176,8 +177,12 @@ public class Main extends Application {
                 alert.showAndWait();
             } else {
                 MWVC.readVersions(Main.currentFile.getAbsolutePath());
-                ArrayList<String> choices = new ArrayList<>(MWVC.versions.keySet());
+                Map<String, String> newVersions = MWVC.versions.entrySet().stream()
+                        .sorted(new VersionSortComparator())
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+                ArrayList<String> choices = new ArrayList<>(newVersions.keySet());
                 ChoiceDialog<String> dialog = new ChoiceDialog<>("Your Version", choices);
+
                 dialog.setTitle("Version Selector");
                 dialog.setHeaderText("Choose the version you want to jump to:");
                 dialog.setContentText("Choose the version you want to jump to:");
@@ -185,13 +190,13 @@ public class Main extends Application {
                 result.ifPresent(option -> {
                     String[] content = new String[12345678];
                     MWVC.readVersions(Main.currentFile.getAbsolutePath());
-                    int currentVersion = 0;
-                    for (String line : MWVC.versions.values()) {
-                        if (currentVersion == Integer.parseInt(option.split("\\|")[0].replace(":", ""))) {
-                            break;
-                        }
+                    int currentVersion = 1;
+                    for (String line : newVersions.values()) {
                         for (String change : line.split(";")) {
                             content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
+                        }
+                        if (currentVersion == Integer.parseInt(option.split("\\|")[0].replace(":", ""))) {
+                            break;
                         }
                         currentVersion++;
                     }
@@ -233,9 +238,9 @@ public class Main extends Application {
 
     private static void commit() {
         TextInputDialog dialog = new TextInputDialog("walter");
-        dialog.setTitle("Text Input Dialog");
-        dialog.setHeaderText("Look, a Text Input Dialog");
-        dialog.setContentText("Please enter your name:");
+        dialog.setTitle("New Commit");
+        dialog.setHeaderText("The actual name of the commit will also have the date stored with it");
+        dialog.setContentText("Please enter your commit comment:");
 
         Optional<String> result = dialog.showAndWait();
 

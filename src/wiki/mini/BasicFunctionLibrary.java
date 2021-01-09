@@ -2,6 +2,8 @@ package wiki.mini;
 
 import javafx.scene.control.Alert;
 
+import java.util.*;
+
 /**
  * Function Library which contains useful methods
  *
