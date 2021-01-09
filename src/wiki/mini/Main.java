@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -19,10 +18,7 @@ import javafx.stage.Stage;
 import wiki.mini.tags.*;
 import wiki.mini.version.control.MWVC;
 
-import java.awt.event.WindowStateListener;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.regex.Matcher;
 
 
@@ -46,6 +42,10 @@ public class Main extends Application {
     public static TextArea textArea;
     static WebView webView;
     static Button convertButton;
+    static Button commitButton;
+
+    public static Stage stage;
+
     /**
      * The html that is being written into the file
      */
@@ -95,6 +95,9 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage stage) {
+
+        Main.stage = stage;
+
         stage.setTitle("Mini Wiki");
 
         Canvas canvas = new Canvas(50, 600);
@@ -154,6 +157,7 @@ public class Main extends Application {
                     }
                 }
                 textArea.setText(BasicFunctionLibrary.ArrayToString(content));
+                currentFile = file;
             }
         });
 
@@ -200,16 +204,23 @@ public class Main extends Application {
         textArea = new TextArea();
         webView = new WebView();
         convertButton = new Button("Compile to HTML");
+        commitButton = new Button("Commit");
 
         main.setLeft(textArea);
         main.setRight(webView);
         main.setBottom(convertButton);
+        main.setBottom(commitButton);
 
         convertButton.setOnMouseClicked(onCompile);
+        commitButton.setOnMouseClicked(onCommit);
 
         stage.setResizable(false);
         stage.setScene(new Scene(main));
         stage.show();
+    }
+
+    private static void commit() {
+        MWVC.createVersion();
     }
 
     /**
@@ -219,7 +230,7 @@ public class Main extends Application {
      * @param fileChooser Filechosser
      * @param text        Content
      */
-    private void createFile(Stage stage, FileChooser fileChooser, String text) {
+    public void createFile(Stage stage, FileChooser fileChooser, String text) {
         File file = fileChooser.showSaveDialog(stage);
         try {
             FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
@@ -234,11 +245,11 @@ public class Main extends Application {
         } catch (Exception e) {
             BasicFunctionLibrary.createRequest("Error", "IO Exception", "There was an error during the file creation process! Try again!");
         }
-
     }
 
 
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
+    EventHandler<MouseEvent> onCommit = mouseEvent -> commit();
 
     /**
      * Set HTML Method Converts the markdown language into HTML Code

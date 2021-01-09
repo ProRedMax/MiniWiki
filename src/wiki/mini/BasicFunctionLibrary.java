@@ -22,7 +22,7 @@ public class BasicFunctionLibrary {
         for (String s : array) {
             if (s != null) {
                 sb.append(s.replace("\"", "")).append(System.lineSeparator());
-            }else {
+            } else {
                 sb.append("\0");
             }
         }
