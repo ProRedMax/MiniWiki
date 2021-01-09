@@ -1,22 +1,25 @@
 package wiki.mini.version.control;
 
+import javafx.css.Match;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import wiki.mini.BasicFunctionLibrary;
 import wiki.mini.Main;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MWVC {
 
-    public static HashMap<Integer, String> versions = new HashMap<>();
+    public static HashMap<String, String> versions = new HashMap<>();
 
     public static int getCurrentVersion() {
         readVersions(Main.currentFile.getAbsolutePath());
@@ -26,12 +29,16 @@ public class MWVC {
     public static void readVersions(String file) {
         try (BufferedReader rd = Files.newBufferedReader(Paths.get(file))) {
             String line;
-            int version = 0;
             outer:
             while ((line = rd.readLine()) != null) {
                 try {
-                    versions.put(version, line.trim().split(":\\d+:")[1]);
-                    version++;
+                    String key = "";
+                    Pattern pattern = Pattern.compile(":.+:");
+                    Matcher matcher = pattern.matcher(line.trim());
+                    if (matcher.find()) {
+                        key = matcher.group(0);
+                    }
+                    versions.put(key, line.trim().split(":.+:")[1]);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     continue outer;
                 }
@@ -41,7 +48,7 @@ public class MWVC {
         }
     }
 
-    public static void createVersion() {
+    public static void createVersion(String name) {
         if (Main.currentFile == null) {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showSaveDialog(Main.stage);
@@ -53,7 +60,7 @@ public class MWVC {
             }
         }
         readVersions(Main.currentFile.getAbsolutePath());
-        String toWrite = diffVersions();
+        String toWrite = diffVersions(name);
         try {
             FileWriter fileWriter = new FileWriter(Main.currentFile, true);
             fileWriter.write(toWrite);
@@ -73,10 +80,12 @@ public class MWVC {
         return BasicFunctionLibrary.ArrayToString(content);
     }
 
-    public static String diffVersions() {
+    public static String diffVersions(String name) {
         String[] content = Main.textArea.getText().split("\n");
         String[] oldContent = createOldLastVersion().split("\n");
-        StringBuilder toWrite = new StringBuilder("\n:" + (getCurrentVersion() + 1) + ":");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss");
+        LocalDateTime now = LocalDateTime.now();
+        StringBuilder toWrite = new StringBuilder("\n:" + (getCurrentVersion() + 1) + "|" + name + "#" + dtf.format(now) + "#:");
         for (int i = 0; i < Math.max(content.length, oldContent.length); i++) {
             try {
                 if (!(content[i].equals(oldContent[i].replace("\r", "")))) {

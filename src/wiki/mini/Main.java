@@ -4,11 +4,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -19,6 +15,9 @@ import wiki.mini.tags.*;
 import wiki.mini.version.control.MWVC;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 
@@ -102,6 +101,7 @@ public class Main extends Application {
 
         Canvas canvas = new Canvas(50, 600);
         BorderPane main = new BorderPane(canvas);
+        BorderPane buttonPane = new BorderPane(canvas);
 
         // Create MenuBar
         MenuBar menuBar = new MenuBar();
@@ -112,16 +112,14 @@ public class Main extends Application {
         Menu helpMenu = new Menu("Help");
 
         // Create MenuItems
-        MenuItem newItem = new MenuItem("Save File As");
-        MenuItem saveItem = new MenuItem("Save");
         MenuItem openProjectItem = new MenuItem("Open Project");
         MenuItem extractHTML = new MenuItem("Extract HTML");
         MenuItem exitItem = new MenuItem("Exit");
         MenuItem compileHTML = new MenuItem("Compile to HTML");
+        MenuItem about = new MenuItem("About");
+        MenuItem versions = new MenuItem("Select Version");
 
         //Keybinds
-        newItem.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
-        saveItem.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
         extractHTML.setAccelerator(KeyCombination.keyCombination(("Ctrl+H")));
         compileHTML.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+C"));
@@ -144,6 +142,14 @@ public class Main extends Application {
             createFile(stage, fileChooser, finalHTML);
         });
 
+        about.setOnAction(actionEvent -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("About Page");
+            alert.setHeaderText("Mini Wiki About Page");
+            alert.setContentText("This program is made by Maximilian Burger.");
+            alert.showAndWait();
+        });
+
         //Open Project
         openProjectItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
@@ -161,39 +167,44 @@ public class Main extends Application {
             }
         });
 
-        //SaveFileAs
-        newItem.setOnAction(actionEvent -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Text File", "*.txt")
-            );
-            createFile(stage, fileChooser, textArea.getText());
-        });
-
-        //SaveAs
-        saveItem.setOnAction(actionEvent -> {
-            if (currentFile != null) {
-                try {
-                    FileWriter fileWriter = new FileWriter(currentFile, false);
-                    setHTML();
-                    fileWriter.write(textArea.getText());
-                    fileWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        versions.setOnAction(actionEvent -> {
+            if (Main.currentFile == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("There are currently no versions present! Create on by pressing the commit Button!");
+                alert.setContentText("Ooops, there was an error!");
+                alert.showAndWait();
             } else {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Text File", "*.txt")
-                );
-                createFile(stage, fileChooser, textArea.getText());
+                MWVC.readVersions(Main.currentFile.getAbsolutePath());
+                ArrayList<String> choices = new ArrayList<>(MWVC.versions.keySet());
+                ChoiceDialog<String> dialog = new ChoiceDialog<>("Your Version", choices);
+                dialog.setTitle("Version Selector");
+                dialog.setHeaderText("Choose the version you want to jump to:");
+                dialog.setContentText("Choose the version you want to jump to:");
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(option -> {
+                    String[] content = new String[12345678];
+                    MWVC.readVersions(Main.currentFile.getAbsolutePath());
+                    int currentVersion = 0;
+                    for (String line : MWVC.versions.values()) {
+                        if (currentVersion == Integer.parseInt(option.split("\\|")[0].replace(":", ""))) {
+                            break;
+                        }
+                        for (String change : line.split(";")) {
+                            content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
+                        }
+                        currentVersion++;
+                    }
+                    textArea.setText(BasicFunctionLibrary.ArrayToString(content));
+                });
             }
         });
 
 
         // Add menuItems to the Menus
-        fileMenu.getItems().addAll(saveItem, newItem, openProjectItem, exitItem, extractHTML);
-        editMenu.getItems().addAll(compileHTML);
+        fileMenu.getItems().addAll(openProjectItem, exitItem, extractHTML);
+        editMenu.getItems().addAll(compileHTML, versions);
+        helpMenu.getItems().addAll(about);
 
         // Add Menus to the MenuBar
         menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
@@ -208,8 +219,9 @@ public class Main extends Application {
 
         main.setLeft(textArea);
         main.setRight(webView);
-        main.setBottom(convertButton);
-        main.setBottom(commitButton);
+        main.setBottom(buttonPane);
+        buttonPane.setCenter(convertButton);
+        buttonPane.setRight(commitButton);
 
         convertButton.setOnMouseClicked(onCompile);
         commitButton.setOnMouseClicked(onCommit);
@@ -220,7 +232,14 @@ public class Main extends Application {
     }
 
     private static void commit() {
-        MWVC.createVersion();
+        TextInputDialog dialog = new TextInputDialog("walter");
+        dialog.setTitle("Text Input Dialog");
+        dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setContentText("Please enter your name:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(MWVC::createVersion);
     }
 
     /**
@@ -234,13 +253,8 @@ public class Main extends Application {
         File file = fileChooser.showSaveDialog(stage);
         try {
             FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
-            MWVC.readVersions(file.getAbsolutePath());
-            fileWriter.write(BasicFunctionLibrary.versionsToString(MWVC.versions));
+            fileWriter.write(text);
             fileWriter.close();
-
-            if (file.getName().split("\\.")[1].equalsIgnoreCase("mw")) {
-                currentFile = file;
-            }
 
         } catch (Exception e) {
             BasicFunctionLibrary.createRequest("Error", "IO Exception", "There was an error during the file creation process! Try again!");

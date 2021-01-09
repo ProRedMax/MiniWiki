@@ -2,8 +2,6 @@ package wiki.mini;
 
 import javafx.scene.control.Alert;
 
-import java.util.HashMap;
-
 /**
  * Function Library which contains useful methods
  *
@@ -85,14 +83,6 @@ public class BasicFunctionLibrary {
         alert.setHeaderText(headText);
         alert.setContentText(text);
         alert.showAndWait();
-    }
-
-    public static String versionsToString(HashMap<Integer, String> map) {
-        StringBuilder returnString = new StringBuilder();
-        for (Integer i : map.keySet()) {
-            returnString.append(":").append(i.toString()).append(":").append(map.get(i));
-        }
-        return returnString.toString();
     }
 
 }
