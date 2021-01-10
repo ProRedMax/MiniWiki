@@ -1,6 +1,5 @@
 package wiki.mini.version.control;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class MWVCTest {
 

@@ -168,6 +168,7 @@ public class Main extends Application {
             }
         });
 
+        // Versions
         versions.setOnAction(actionEvent -> {
             if (Main.currentFile == null) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -237,7 +238,7 @@ public class Main extends Application {
     }
 
     private static void commit() {
-        TextInputDialog dialog = new TextInputDialog("walter");
+        TextInputDialog dialog = new TextInputDialog("Commit Name");
         dialog.setTitle("New Commit");
         dialog.setHeaderText("The actual name of the commit will also have the date stored with it");
         dialog.setContentText("Please enter your commit comment:");

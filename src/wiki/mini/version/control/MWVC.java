@@ -33,12 +33,12 @@ public class MWVC {
             while ((line = rd.readLine()) != null) {
                 try {
                     String key = "";
-                    Pattern pattern = Pattern.compile(":.+:");
+                    Pattern pattern = Pattern.compile(":.+#:");
                     Matcher matcher = pattern.matcher(line.trim());
                     if (matcher.find()) {
                         key = matcher.group(0);
                     }
-                    versions.put(key, line.trim().split(":.+:")[1]);
+                    versions.put(key, line.trim().split(":.+#:")[1]);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     continue outer;
                 }
@@ -51,6 +51,7 @@ public class MWVC {
     public static void createVersion(String name) {
         if (Main.currentFile == null) {
             FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw"));
             File file = fileChooser.showSaveDialog(Main.stage);
             try {
                 file.createNewFile();
