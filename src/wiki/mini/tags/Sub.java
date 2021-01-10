@@ -2,9 +2,15 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
+/**
+ * @author mabug
+ */
 public class Sub extends Style {
 
-    private final String REGEX = "-[vV]([^-]+)-";
+    /**
+      * Regex
+      */
+    private static final String REGEX = "-[vV]([^-]+)-";
 
     @Override
     public Pattern getPattern() {

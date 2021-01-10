@@ -4,20 +4,44 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import wiki.mini.tags.*;
+import wiki.mini.tags.Bold;
+import wiki.mini.tags.Br;
+import wiki.mini.tags.Code;
+import wiki.mini.tags.H1;
+import wiki.mini.tags.H2;
+import wiki.mini.tags.H3;
+import wiki.mini.tags.H4;
+import wiki.mini.tags.H5;
+import wiki.mini.tags.H6;
+import wiki.mini.tags.Hr;
+import wiki.mini.tags.Italic;
+import wiki.mini.tags.Link;
 import wiki.mini.tags.List;
+import wiki.mini.tags.Style;
+import wiki.mini.tags.Sub;
+import wiki.mini.tags.Sup;
 import wiki.mini.version.control.MWVC;
 
-import java.io.*;
-import java.util.*;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -39,11 +63,31 @@ public class Main extends Application {
         Application.launch(args);
     }
 
+    /**
+     * Maximum lines in a file. Used for the arrays
+     */
+    public static final int MAX_FILE_LINE_SIZE = 12345;
+
+    /**
+     * Text Area for markdown
+     */
     public static TextArea textArea;
+    /**
+     * HTML View
+     */
     static WebView webView;
+    /**
+     * Convert Button to html
+     */
     static Button convertButton;
+    /**
+     * Commit to vc
+     */
     static Button commitButton;
 
+    /**
+     * Stage
+     */
     public static Stage stage;
 
     /**
@@ -62,30 +106,26 @@ public class Main extends Application {
     /**
      * Default HTML construct before the code
      */
-    String[] defaultHTMLBeforeBody = new String[]{
-            "<!DOCTYPE html>",
-            "<html lang=de>",
-            "<head>",
-            "<title>MiniWiki</title>",
-            "<meta charset=\"utf-8\">",
-            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
-            "</head>",
-            "<body>"
+    String[] defaultHTMLBeforeBody = new String[]{"<!DOCTYPE html>", "<html lang=de>", "<head>",
+        "<title>MiniWiki</title>", "<meta charset=\"utf-8\">",
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+        "</head>", "<body>"
     };
 
     /**
      * Default HMTL construct after the code
      */
     String[] defaultHTMLAfterBody = new String[]{
-            "</body>",
-            "</html>"
+        "</body>",
+        "</html>"
     };
 
     /**
      * All Styles that should be checked
      */
-    Style[] allowedStyles = new Style[]{new H6(), new H5(), new H4(), new H3(), new H2(), new H1(), new Italic(),
-            new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link(), new List()};
+    Style[] allowedStyles = new Style[]{new H6(), new H5(), new H4(), new H3(),
+        new H2(), new H1(), new Italic(),
+        new Bold(), new Br(), new Code(), new Hr(), new Sub(), new Sup(), new Link(), new List()};
 
 
     /**
@@ -100,7 +140,9 @@ public class Main extends Application {
 
         stage.setTitle("Mini Wiki");
 
-        Canvas canvas = new Canvas(50, 600);
+        final int v = 50;
+        final int v1 = 600;
+        Canvas canvas = new Canvas(v, v1);
         BorderPane main = new BorderPane(canvas);
         BorderPane buttonPane = new BorderPane(canvas);
 
@@ -155,7 +197,7 @@ public class Main extends Application {
         openProjectItem.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(stage);
-            String[] content = new String[12345678];
+            String[] content = new String[MAX_FILE_LINE_SIZE];
             if (file != null) {
                 MWVC.readVersions(file.getAbsolutePath());
                 for (String line : MWVC.versions.values()) {
@@ -163,7 +205,7 @@ public class Main extends Application {
                         content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
                     }
                 }
-                textArea.setText(BasicFunctionLibrary.ArrayToString(content));
+                textArea.setText(BasicFunctionLibrary.arrayToString(content));
                 currentFile = file;
             }
         });
@@ -173,14 +215,17 @@ public class Main extends Application {
             if (Main.currentFile == null) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
-                alert.setHeaderText("There are currently no versions present! Create on by pressing the commit Button!");
+                alert.setHeaderText("There are currently no versions present!"
+                       + " Create on by pressing the commit Button!");
                 alert.setContentText("Ooops, there was an error!");
                 alert.showAndWait();
             } else {
                 MWVC.readVersions(Main.currentFile.getAbsolutePath());
                 Map<String, String> newVersions = MWVC.versions.entrySet().stream()
                         .sorted(new VersionSortComparator())
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+                        .collect(Collectors.toMap(Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (e1, e2) -> e1, LinkedHashMap::new));
                 ArrayList<String> choices = new ArrayList<>(newVersions.keySet());
                 ChoiceDialog<String> dialog = new ChoiceDialog<>("Your Version", choices);
 
@@ -189,19 +234,20 @@ public class Main extends Application {
                 dialog.setContentText("Choose the version you want to jump to:");
                 Optional<String> result = dialog.showAndWait();
                 result.ifPresent(option -> {
-                    String[] content = new String[12345678];
+                    String[] content = new String[MAX_FILE_LINE_SIZE];
                     MWVC.readVersions(Main.currentFile.getAbsolutePath());
                     int currentVersion = 1;
                     for (String line : newVersions.values()) {
                         for (String change : line.split(";")) {
                             content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
                         }
-                        if (currentVersion == Integer.parseInt(option.split("\\|")[0].replace(":", ""))) {
+                        if (currentVersion == Integer.parseInt(option.split("\\|")[0]
+                                .replace(":", ""))) {
                             break;
                         }
                         currentVersion++;
                     }
-                    textArea.setText(BasicFunctionLibrary.ArrayToString(content));
+                    textArea.setText(BasicFunctionLibrary.arrayToString(content));
                 });
             }
         });
@@ -240,7 +286,8 @@ public class Main extends Application {
     private static void commit() {
         TextInputDialog dialog = new TextInputDialog("Commit Name");
         dialog.setTitle("New Commit");
-        dialog.setHeaderText("The actual name of the commit will also have the date stored with it");
+        dialog.setHeaderText("The actual name of the commit will also have "
+                + "the date stored with it");
         dialog.setContentText("Please enter your commit comment:");
 
         Optional<String> result = dialog.showAndWait();
@@ -263,12 +310,19 @@ public class Main extends Application {
             fileWriter.close();
 
         } catch (Exception e) {
-            BasicFunctionLibrary.createRequest("Error", "IO Exception", "There was an error during the file creation process! Try again!");
+            BasicFunctionLibrary.createRequest("Error", "IO Exception",
+                    "There was an error during the file creation process! Try again!");
         }
     }
 
 
+    /**
+     * On Compile
+     */
     EventHandler<MouseEvent> onCompile = actionEvent -> setHTML();
+    /**
+     * On Commit
+     */
     EventHandler<MouseEvent> onCommit = mouseEvent -> commit();
 
     /**
@@ -279,7 +333,7 @@ public class Main extends Application {
         String text = textArea.getText();
         String[] lines = text.split("\n");
         StringBuilder htmlLine = new StringBuilder();
-        html = new String[Integer.MAX_VALUE / 100000];
+        html = new String[MAX_FILE_LINE_SIZE];
         int htmlIndex = 0;
         for (String line : lines) { //Every Line
             htmlLine = new StringBuilder();
@@ -291,7 +345,8 @@ public class Main extends Application {
                         inList = true;
                     }
                     if (!(allowedStyle instanceof List) && inList) {
-                        htmlLine.append(BasicFunctionLibrary.multiplyString("</li></ul>", List.currentIndention));
+                        htmlLine.append(BasicFunctionLibrary
+                                .multiplyString("</li></ul>", List.currentIndention));
                         inList = false;
                         for (Style style : allowedStyles) {
                             style.resetVariables();
@@ -307,15 +362,16 @@ public class Main extends Application {
         }
         //Closing the list when the markdown file ends IF IN LIST
         if (inList) {
-            html[htmlIndex] = BasicFunctionLibrary.multiplyString("</li></ul>", List.currentIndention);
+            html[htmlIndex] = BasicFunctionLibrary
+                    .multiplyString("</li></ul>", List.currentIndention);
             for (Style style : allowedStyles) {
                 style.resetVariables();
             }
         }
 
-        finalHTML = BasicFunctionLibrary.ArrayToString(defaultHTMLBeforeBody)
-                + BasicFunctionLibrary.ArrayToString(html)
-                + BasicFunctionLibrary.ArrayToString(defaultHTMLAfterBody);
+        finalHTML = BasicFunctionLibrary.arrayToString(defaultHTMLBeforeBody)
+                + BasicFunctionLibrary.arrayToString(html)
+                + BasicFunctionLibrary.arrayToString(defaultHTMLAfterBody);
         webView.getEngine().loadContent(finalHTML);
     }
 

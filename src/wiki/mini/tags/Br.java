@@ -2,9 +2,15 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class Br extends Style{
+/**
+ * @author mabug
+ */
+public class Br extends Style {
 
-    private final String REGEX = "^()$";
+    /**
+      * Regex
+      */
+    private static final String REGEX = "^()$";
 
     @Override
     public Pattern getPattern() {

@@ -3,6 +3,9 @@ package wiki.mini;
 import java.util.Comparator;
 import java.util.Map;
 
+/**
+ * @author mabug
+ */
 public class VersionSortComparator implements Comparator<Map.Entry<String, String>> {
 
     /**
@@ -47,7 +50,8 @@ public class VersionSortComparator implements Comparator<Map.Entry<String, Strin
      */
     @Override
     public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
-        return Integer.compareUnsigned(Integer.parseInt(o1.getKey().split("\\|")[0].replace(":", "")),
+        return Integer.compareUnsigned(Integer.parseInt(o1.getKey()
+                        .split("\\|")[0].replace(":", "")),
                 Integer.parseInt(o2.getKey().split("\\|")[0].replace(":", "")));
     }
 }

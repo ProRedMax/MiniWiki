@@ -1,6 +1,5 @@
 package wiki.mini.version.control;
 
-import javafx.css.Match;
 import javafx.stage.FileChooser;
 import wiki.mini.BasicFunctionLibrary;
 import wiki.mini.Main;
@@ -17,15 +16,27 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author mabug
+ */
 public class MWVC {
 
+    /**
+     * Localy stored versions
+     */
     public static HashMap<String, String> versions = new HashMap<>();
 
+    /**
+     * @return Last Versions
+     */
     public static int getCurrentVersion() {
         readVersions(Main.currentFile.getAbsolutePath());
         return versions.size();
     }
 
+    /**
+     * @param file File
+     */
     public static void readVersions(String file) {
         try (BufferedReader rd = Files.newBufferedReader(Paths.get(file))) {
             String line;
@@ -44,14 +55,19 @@ public class MWVC {
                 }
             }
         } catch (IOException e) {
-            BasicFunctionLibrary.createRequest("Error", "File IO", "There was an error during the process of reading the versions!");
+            BasicFunctionLibrary.createRequest("Error", "File IO",
+                    "There was an error during the process of reading the versions!");
         }
     }
 
+    /**
+     * @param name Commit Comment cllaed from the lambda
+     */
     public static void createVersion(String name) {
         if (Main.currentFile == null) {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Mini Wiki File", "*.mw"));
+            fileChooser.getExtensionFilters().add(new FileChooser
+                    .ExtensionFilter("Mini Wiki File", "*.mw"));
             File file = fileChooser.showSaveDialog(Main.stage);
             try {
                 file.createNewFile();
@@ -71,22 +87,30 @@ public class MWVC {
         }
     }
 
+    /**
+     * @return The full versiohn stored
+     */
     public static String createOldLastVersion() {
-        String[] content = new String[12345];
+        String[] content = new String[Main.MAX_FILE_LINE_SIZE];
         for (String line : MWVC.versions.values()) {
             for (String change : line.split(";")) {
                 content[Integer.parseInt(change.split(",")[0])] = change.split(",")[1];
             }
         }
-        return BasicFunctionLibrary.ArrayToString(content);
+        return BasicFunctionLibrary.arrayToString(content);
     }
 
+    /**
+     * @param name Name of the commit
+     * @return Difference String ready to be stored into the
+     */
     public static String diffVersions(String name) {
         String[] content = Main.textArea.getText().split("\n");
         String[] oldContent = createOldLastVersion().split("\n");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss");
         LocalDateTime now = LocalDateTime.now();
-        StringBuilder toWrite = new StringBuilder("\n:" + (getCurrentVersion() + 1) + "|" + name + "#" + dtf.format(now) + "#:");
+        StringBuilder toWrite = new StringBuilder("\n:" + (getCurrentVersion() + 1) + "|"
+                + name + "#" + dtf.format(now) + "#:");
         for (int i = 0; i < Math.max(content.length, oldContent.length); i++) {
             try {
                 if (!(content[i].equals(oldContent[i].replace("\r", "")))) {

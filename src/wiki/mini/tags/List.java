@@ -5,11 +5,20 @@ import java.util.regex.Pattern;
 import static wiki.mini.BasicFunctionLibrary.countSameCharInSequence;
 import static wiki.mini.BasicFunctionLibrary.multiplyString;
 
+/**
+ * @author mabug
+ */
 public class List extends Style {
 
+    /**
+     * Current Indention
+     */
     public static int currentIndention = 0;
 
-    private final String REGEX = "^(-+[^-]+)";
+    /**
+      * Regex
+      */
+    private static final String REGEX = "^(-+[^-]+)";
 
     @Override
     public void resetVariables() {
@@ -27,12 +36,16 @@ public class List extends Style {
         String content = word.substring(countSameCharInSequence(word, '-'));
         int indention = countSameCharInSequence(word, '-');
         if (currentIndention != 0) {
-            returnString += currentIndention - indention == 0 ? "</li>" : multiplyString("</li>\n</ul>\n</li>", currentIndention - indention);
+            if (currentIndention - indention == 0) returnString += "</li>";
+            else returnString += multiplyString("</li>\n</ul>\n</li>",
+                    currentIndention - indention);
         } else {
             currentIndention = 1;
         }
 
-        returnString += currentIndention - indention >= 0 ? "<li>" : multiplyString("<ul><li>", Math.abs(currentIndention - indention));
+        if (currentIndention - indention >= 0) returnString += "<li>";
+        else returnString += multiplyString("<ul><li>",
+                Math.abs(currentIndention - indention));
 
         returnString += content;
 

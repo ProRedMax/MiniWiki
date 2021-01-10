@@ -2,9 +2,16 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class Bold extends Style{
 
-    private final String REGEX = "''([^'']+)''";
+/**
+ * @author mabug
+ */
+public class Bold extends Style {
+
+    /**
+      * Regex
+      */
+    private static final String REGEX = "''([^'']+)''";
 
     @Override
     public Pattern getPattern() {

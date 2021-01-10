@@ -2,9 +2,15 @@ package wiki.mini.tags;
 
 import java.util.regex.Pattern;
 
-public class H5 extends Style{
+/**
+ * @author mabug
+ */
+public class H5 extends Style {
 
-    private final String REGEX = "^!!!!!\\s(.+)";
+    /**
+      * Regex
+      */
+    private static final String REGEX = "^!!!!!\\s(.+)";
 
     @Override
     public Pattern getPattern() {

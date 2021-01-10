@@ -2,8 +2,6 @@ package wiki.mini;
 
 import javafx.scene.control.Alert;
 
-import java.util.*;
-
 /**
  * Function Library which contains useful methods
  *
@@ -17,7 +15,7 @@ public class BasicFunctionLibrary {
      * @param array Array
      * @return String
      */
-    public static String ArrayToString(String[] array) {
+    public static String arrayToString(String[] array) {
         StringBuffer sb = new StringBuffer();
         for (String s : array) {
             if (s != null) {
@@ -79,6 +77,11 @@ public class BasicFunctionLibrary {
         return count;
     }
 
+    /**
+     * @param title Title
+     * @param headText HeadText
+     * @param text Text
+     */
     public static void createRequest(String title, String headText, String text) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

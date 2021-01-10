@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 /**
  * Abstract style class for all the tags
+ * @author mabug
  */
 public abstract class Style {
 
