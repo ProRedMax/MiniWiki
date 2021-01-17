@@ -207,6 +207,7 @@ public class Main extends Application {
                 }
                 textArea.setText(BasicFunctionLibrary.arrayToString(content));
                 currentFile = file;
+                setHTML();
             }
         });
 
@@ -248,6 +249,7 @@ public class Main extends Application {
                         currentVersion++;
                     }
                     textArea.setText(BasicFunctionLibrary.arrayToString(content));
+                    setHTML();
                 });
             }
         });
